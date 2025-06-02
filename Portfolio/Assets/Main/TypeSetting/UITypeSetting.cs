@@ -44,12 +44,23 @@ public class UITypeSetting : MonoBehaviour {
 
 	[Serializable]
 	public class UITypeSettingInfo {
-		[Tooltip("스크립트 enable 설정")] public List<UITypeSettingEnable> enableList;
-		[Tooltip("게임오브젝트 active 설정")] public List<UITypeSettingGameObject> gameobjectList;
-		[Tooltip("이미지 sprite 설정")] public List<UITypeSettingSprite> spriteList;
-		[Tooltip("색상 설정")] public List<UITypeSettingGraphicColor> graphicColorList;
-		[Tooltip("RectTransform 값 설정")] public List<UITypeSettingRectTransform> rectTransformList;
-		[Tooltip("텍스트 문구 설정")] public List<UITypeSettingText> textList;
+		[Tooltip("스크립트 enable 설정")]
+		public List<UITypeSettingEnable> enableList;
+
+		[Tooltip("게임오브젝트 active 설정")]
+		public List<UITypeSettingGameObject> gameobjectList;
+
+		[Tooltip("이미지 sprite 설정")]
+		public List<UITypeSettingSprite> spriteList;
+
+		[Tooltip("색상 설정")]
+		public List<UITypeSettingGraphicColor> graphicColorList;
+
+		[Tooltip("RectTransform 값 설정")]
+		public List<UITypeSettingRectTransform> rectTransformList;
+
+		[Tooltip("텍스트 문구 설정")]
+		public List<UITypeSettingText> textList;
 
 		public void Active() {
 			if (enableList != null) {
@@ -97,23 +108,23 @@ public class UITypeSetting : MonoBehaviour {
 			rectTransformList.Clear();
 
 			foreach (UITypeSettingEnable uiTypeSettingEnable in copyInfo.enableList) {
-				enableList.Add(uiTypeSettingEnable.DeepCopy());
+				enableList.Add(uiTypeSettingEnable);
 			}
 
 			foreach (UITypeSettingGameObject uiTypeSettingGameObject in copyInfo.gameobjectList) {
-				gameobjectList.Add(uiTypeSettingGameObject.DeepCopy());
+				gameobjectList.Add(uiTypeSettingGameObject);
 			}
 
 			foreach (UITypeSettingSprite uiTypeSettingSprite in copyInfo.spriteList) {
-				spriteList.Add(uiTypeSettingSprite.DeepCopy());
+				spriteList.Add(uiTypeSettingSprite);
 			}
 
 			foreach (UITypeSettingGraphicColor uiTypeSettingGraphicColor in copyInfo.graphicColorList) {
-				graphicColorList.Add(uiTypeSettingGraphicColor.DeepCopy());
+				graphicColorList.Add(uiTypeSettingGraphicColor);
 			}
 
 			foreach (UITypeSettingRectTransform uiTypeSettingRectTransform in copyInfo.rectTransformList) {
-				rectTransformList.Add(uiTypeSettingRectTransform.DeepCopy());
+				rectTransformList.Add(uiTypeSettingRectTransform);
 			}
 		}
 	}
@@ -132,13 +143,6 @@ public class UITypeSetting : MonoBehaviour {
 				behaviour.enabled = isEnable;
 			}
 		}
-
-		public UITypeSettingEnable DeepCopy() {
-			UITypeSettingEnable other = new UITypeSettingEnable();
-			other.behaviour = behaviour;
-			other.isEnable = isEnable;
-			return other;
-		}
 	}
 
 	[Serializable]
@@ -151,32 +155,21 @@ public class UITypeSetting : MonoBehaviour {
 				gameObject.SetActive(isActive);
 			}
 		}
-
-		public UITypeSettingGameObject DeepCopy() {
-			UITypeSettingGameObject other = new UITypeSettingGameObject();
-			other.gameObject = gameObject;
-			other.isActive = isActive;
-			return other;
-		}
 	}
 
 	[Serializable]
 	public class UITypeSettingSprite : UITypeSettingTypes {
 		public Image image;
 		public Sprite sprite;
+		public bool isSetActiveNative;
 
 		public override void Active() {
 			if (image != null) {
 				image.sprite = sprite;
-				image.SetNativeSize();
+				if (isSetActiveNative) {
+					image.SetNativeSize();
+				}
 			}
-		}
-
-		public UITypeSettingSprite DeepCopy() {
-			UITypeSettingSprite other = new UITypeSettingSprite();
-			other.image = image;
-			other.sprite = sprite;
-			return other;
 		}
 	}
 
@@ -190,13 +183,6 @@ public class UITypeSetting : MonoBehaviour {
 				graphic.color = color;
 			}
 		}
-
-		public UITypeSettingGraphicColor DeepCopy() {
-			UITypeSettingGraphicColor other = new UITypeSettingGraphicColor();
-			other.graphic = graphic;
-			other.color = color;
-			return other;
-		}
 	}
 
 	[Serializable]
@@ -209,13 +195,6 @@ public class UITypeSetting : MonoBehaviour {
 				rectTransform.localScale = scale;
 			}
 		}
-
-		public UITypeSettingRectTransform DeepCopy() {
-			UITypeSettingRectTransform other = new UITypeSettingRectTransform();
-			other.rectTransform = rectTransform;
-			other.scale = scale;
-			return other;
-		}
 	}
 
 	[Serializable]
@@ -225,13 +204,6 @@ public class UITypeSetting : MonoBehaviour {
 
 		public override void Active() {
 			text.text = textString;
-		}
-
-		public UITypeSettingText DeepCopy() {
-			UITypeSettingText other = new UITypeSettingText();
-			other.text = text;
-			other.textString = textString;
-			return other;
 		}
 	}
 }
