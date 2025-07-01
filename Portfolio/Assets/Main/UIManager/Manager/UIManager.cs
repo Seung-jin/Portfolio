@@ -93,7 +93,7 @@ public class UIManager : Singleton<UIManager> {
 				uiBase.OnBack();
 				break;
 			case BackButtonType.GameExit:
-				// 게임 종료 팝업.
+				Show(UIType.GameExit);
 				break;
 		}
 	}
