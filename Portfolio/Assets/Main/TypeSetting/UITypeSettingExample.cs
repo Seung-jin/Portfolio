@@ -27,8 +27,5 @@ public class UITypeSettingExample : MonoBehaviour {
 
 	public void OnChangeGradeToggle(int grade) {
 		_gradType.Active(grade);
-		// if (isOn) {
-		// 	_test1Type.Active(4);
-		// }
 	}
 }
