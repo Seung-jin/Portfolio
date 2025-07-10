@@ -1,31 +1,7 @@
 # 이승진 포트폴리오
 
-## UITypeSetting
-UI의 다양한 컴포넌트들을 원하는 모양으로 세팅 후 아이디를 부여하여 코드상에서 한 번에 호출
+환영합니다! 이 저장소는 유니티에서 작업하였던 다양한 기능들을 정리해둔 포트폴리오입니다.
 
----
-
-![버튼 디자인 변경 예시](docs/UITypeSettingButton.gif "버튼 디자인 변경")
-
-텍스트와 이미지를 변경하는 것이 아니라 미리 저장해둔 세팅을 bool값으로 불러오는 모습
-```csharp
-private UITypeSetting _test1Type;
-
-// 1번 토글
-_test1Type.Active(true);
-
-// 2번 토글
-_test1Type.Active(false);
-```
-
----
-
-![등급에 따른 슬롯 변경 예시](docs/UITypeSettingGrade.gif "등급 슬롯 디자인 변경")
-
-등급에 맞는 이미지들을 세팅 후 int값으로 UI 변경
-```csharp
-private UITypeSetting _gradType;
-public void OnChangeGradeToggle(int grade) {
-    _gradType.Active(grade);
-}
-```
+- UI오브젝트 세팅 저장 [UITypeSetting](docs/UITypeSetting.md)
+- 간단한 UI 연출 [UIDirection](docs/UIDirection.md)
+- UI 구조 [UIManager](docs/UIManager.md)

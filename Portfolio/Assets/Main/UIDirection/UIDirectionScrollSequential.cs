@@ -19,7 +19,6 @@ public class UIDirectionScrollSequential : UIDirection {
 	}
 
 	protected override async UniTask PlayAsync() {
-		// _scrollRect.verticalNormalizedPosition = 0f;
 		foreach (Transform childTransform in _childTransformArr) {
 			childTransform.gameObject.SetActive(false);
 		}
