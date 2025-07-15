@@ -5,3 +5,4 @@
 - UI오브젝트 세팅 저장 [UITypeSetting](docs/UITypeSetting.md)
 - 간단한 UI 연출 [UIDirection](docs/UIDirection.md)
 - UI 구조 [UIManager](docs/UIManager.md)
+- 언어 변경 [Locale](docs/Locale.md)

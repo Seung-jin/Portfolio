@@ -1,0 +1,5 @@
+key	Korean	English	Japanese
+HELLO_WORLD	안녕, 세계!	Hello, world!	こんにちは！
+TITLE	제목	Title	だいもく
+CONTENTS	내용	Contents	ないよう
+CONFIRM	확인	Confirm	かくにん

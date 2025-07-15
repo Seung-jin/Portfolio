@@ -27,6 +27,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b1a825af445e7645b4e114d6329e227
+    m_Address: Locale/TextFile
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9788fca806eeca34183c4cd1069ab855
     m_Address: UIPrefab/UIMain.prefab
     m_ReadOnly: 0
