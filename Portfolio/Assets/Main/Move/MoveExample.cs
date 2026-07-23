@@ -5,6 +5,9 @@ using UnityEngine;
 public class MoveExample : MonoBehaviour {
 	[SerializeField] private List<MoveComponent> _moveComponents;
 
+	[SerializeField] private Transform _target;
+	[SerializeField] private Vector2 _parabolaPos;
+
 	private Vector3[] _startPositions;
 	private bool _isMoving;
 
@@ -30,8 +33,16 @@ public class MoveExample : MonoBehaviour {
 			return;
 		}
 
-		if (_moveComponents[0] is MoveComponentDirection moveComponentDirection) {
+		if (_moveComponents.Count > 0 && _moveComponents[0] is MoveComponentDirection moveComponentDirection) {
 			moveComponentDirection.SetDirection(Vector2.right);
+		}
+
+		if (_moveComponents.Count > 1 && _moveComponents[1] is MoveComponentTarget moveComponentTarget) {
+			moveComponentTarget.SetTarget(_target);
+		}
+
+		if (_moveComponents.Count > 2 && _moveComponents[2] is MoveComponentParabola moveComponentParabola) {
+			moveComponentParabola.SetDestination(_parabolaPos);
 		}
 	}
 
@@ -56,7 +67,7 @@ public class MoveExample : MonoBehaviour {
 	}
 
 	private async UniTaskVoid StopMove() {
-		await UniTask.WaitForSeconds(1.5f);
+		await UniTask.WaitForSeconds(1f);
 
 		foreach (var moveComponent in _moveComponents) {
 			if (moveComponent == null) {

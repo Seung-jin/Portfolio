@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// 지정된 방향으로 이동
+/// </summary>
 public class MoveComponentDirection : MoveComponent {
 	private Vector2 _direction;
 
