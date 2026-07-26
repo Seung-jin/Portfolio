@@ -48,5 +48,3 @@ for (int i = 0; i < count; i++) {
     poolingObject.SetId(_nextId);
 }
 ```
-
-`Pooling.meta`의 `guid`는 Unity 참조에 사용되므로 직접 수정하지 않는 것이 좋음
