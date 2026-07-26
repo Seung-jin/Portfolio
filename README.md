@@ -6,6 +6,6 @@
 - 간단한 UI 연출 [UIDirection](docs/UIDirection.md)
 - UI 구조 [UIManager](docs/UIManager.md)
 - 언어 변경 [Locale](docs/Locale.md)
-- 이동 컴포넌트 [MoveComponent](docs/MoveComponent.md)
+- 이동 컴포넌트 [MoveComponent](docs/Move.md)
 - 옵저버 패턴 [ObserverPattern](docs/Observer.md)
 - 오브젝트 풀링 [ObjectPooling](docs/Pooling.md)
