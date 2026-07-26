@@ -1350,7 +1350,7 @@ MonoBehaviour:
   - {fileID: 1911447360}
   - {fileID: 1973527604}
   _target: {fileID: 908195023}
-  _parabolaPos: {x: -1.5, y: -4.2}
+  _parabolaPos: {x: -1.73, y: -4.18}
 --- !u!4 &1788169647
 Transform:
   m_ObjectHideFlags: 0
