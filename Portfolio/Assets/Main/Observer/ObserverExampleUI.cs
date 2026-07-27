@@ -67,7 +67,7 @@ public class ObserverExampleUI : MonoBehaviour {
 		string targetName = (string)args[1];
 		int damage = (int)args[2];
 
-		AddLog($"{attackerName} attacks {targetName}. Damage: {damage}");
+		AddLog($"{attackerName} 공격. 대상: {targetName}, 피해: {damage}");
 	}
 
 	private void OnDamaged(params object[] args) {
@@ -76,7 +76,7 @@ public class ObserverExampleUI : MonoBehaviour {
 		int currentHealth = (int)args[2];
 		int maxHealth = (int)args[3];
 
-		AddLog($"{targetName} damaged. HP: {currentHealth}/{maxHealth}");
+		AddLog($"{targetName} 피해. HP: {currentHealth}/{maxHealth}");
 	}
 
 	private void OnHealed(params object[] args) {
@@ -85,13 +85,13 @@ public class ObserverExampleUI : MonoBehaviour {
 		int currentHealth = (int)args[2];
 		int maxHealth = (int)args[3];
 
-		AddLog($"{targetName} healed {healAmount}. HP: {currentHealth}/{maxHealth}");
+		AddLog($"{targetName} 회복. 회복량: {healAmount}, HP: {currentHealth}/{maxHealth}");
 	}
 
 	private void OnDead(params object[] args) {
 		string targetName = (string)args[0];
 
-		AddLog($"{targetName} dead.");
+		AddLog($"{targetName} 사망");
 	}
 
 	private void OnBattleReset(params object[] args) {
@@ -99,7 +99,7 @@ public class ObserverExampleUI : MonoBehaviour {
 		int currentHealth = (int)args[1];
 		int maxHealth = (int)args[2];
 
-		AddLog($"Battle reset. {targetName} HP: {currentHealth}/{maxHealth}");
+		AddLog($"전투 초기화. {targetName} HP: {currentHealth}/{maxHealth}");
 	}
 
 	private void OnMessage(params object[] args) {
