@@ -6,105 +6,133 @@ using DG.Tweening;
 #endif
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public enum ShakeInputKey {
-	A,
-	S,
-	D,
-	F
-}
-
+[RequireComponent(typeof(PlayerInput))]
 public class InputExample : MonoBehaviour {
+	private const string MOVE_ACTION_NAME = "Move";
+	private const string SHAKE_ACTION_NAME = "Shake";
 	private const float SHAKE_DURATION = 0.3f;
 	private const float SHAKE_STRENGTH = 0.5f;
 	private const int SHAKE_VIBRATO = 20;
+	private const float MOVE_SPEED = 3f;
+	private const int MAX_LOG_COUNT = 30;
 
-	[SerializeField] private KeyInputBinder _keyInputBinder;
+	[SerializeField] private PlayerInput _playerInput;
 	[SerializeField] private Transform _target;
-	[SerializeField] private float _moveSpeed = 3f;
-	[SerializeField] private ShakeInputKey _shakeKey = ShakeInputKey.A;
-	[SerializeField] private UnityEvent _shakeCallback = new UnityEvent();
 	[SerializeField] private TextMeshProUGUI _logText;
 	[SerializeField] private ScrollRect _logScrollRect;
-	[SerializeField] private int _maxLogCount = 30;
 
-	private Coroutine _shakeCoroutine;
 	private readonly List<string> _logs = new List<string>();
 	private readonly StringBuilder _logBuilder = new StringBuilder();
 
-	public ShakeInputKey CurrentShakeKey => _shakeKey;
+	private InputLogic _inputLogic;
+	private InputAction _moveAction;
+	private InputAction _shakeAction;
+	private Coroutine _shakeCoroutine;
+	private Vector2 _moveInput;
+	private Key _shakeKey = Key.A;
 
 	private void Awake() {
-		if (_keyInputBinder == null) {
-			_keyInputBinder = GetComponent<KeyInputBinder>();
+		if (_playerInput == null) {
+			_playerInput = GetComponent<PlayerInput>();
 		}
 
-		RefreshLogText();
+		if (_playerInput == null || _playerInput.actions == null) {
+			Debug.LogError("[InputExample] PlayerInput actions is null.");
+			return;
+		}
+
+		_playerInput.notificationBehavior = PlayerNotifications.InvokeCSharpEvents;
+		_moveAction = _playerInput.actions.FindAction(MOVE_ACTION_NAME, true);
+		_shakeAction = _playerInput.actions.FindAction(SHAKE_ACTION_NAME, true);
+
+		_inputLogic = new InputLogic(_shakeAction);
+		_inputLogic.SetShakeKey(_shakeKey);
+		RefreshLog();
 	}
 
 	private void OnEnable() {
-		RegisterDefaultInput();
-		RegisterShakeInput();
-		RegisterFailedShakeInput();
+		if (_moveAction == null || _shakeAction == null) {
+			return;
+		}
+
+		_moveAction.performed += OnMove;
+		_moveAction.canceled += OnMove;
+		_shakeAction.performed += OnShake;
+		_playerInput.actions.Enable();
 	}
 
 	private void OnDisable() {
-		UnregisterDefaultInput();
-		UnregisterShakeInput();
-		UnregisterFailedShakeInput();
+		if (_moveAction == null || _shakeAction == null) {
+			return;
+		}
+
+		_moveAction.performed -= OnMove;
+		_moveAction.canceled -= OnMove;
+		_shakeAction.performed -= OnShake;
+		_playerInput.actions.Disable();
+		_moveInput = Vector2.zero;
+	}
+
+	private void Update() {
+		Move(_moveInput);
 	}
 
 	public void SetShakeKeyA() {
-		SetShakeKey(ShakeInputKey.A);
+		SetShakeKey(Key.A);
 	}
 
 	public void SetShakeKeyS() {
-		SetShakeKey(ShakeInputKey.S);
+		SetShakeKey(Key.S);
 	}
 
 	public void SetShakeKeyD() {
-		SetShakeKey(ShakeInputKey.D);
+		SetShakeKey(Key.D);
 	}
 
 	public void SetShakeKeyF() {
-		SetShakeKey(ShakeInputKey.F);
+		SetShakeKey(Key.F);
 	}
 
-	public void SetShakeKey(ShakeInputKey shakeKey) {
+	public void SetShakeKey(Key shakeKey) {
+		shakeKey = InputLogic.NormalizeShakeKey(shakeKey);
 		if (_shakeKey == shakeKey) {
 			return;
 		}
 
-		UnregisterShakeInput();
-		UnregisterFailedShakeInput();
 		_shakeKey = shakeKey;
-		RegisterShakeInput();
-		RegisterFailedShakeInput();
+		_inputLogic.SetShakeKey(_shakeKey);
 		AddLog($"흔들기 키 변경: {_shakeKey}");
-	}
-
-	public void AddShakeCallback(UnityAction callback) {
-		_shakeCallback.AddListener(callback);
-	}
-
-	public void RemoveShakeCallback(UnityAction callback) {
-		_shakeCallback.RemoveListener(callback);
 	}
 
 	public void ClearLog() {
 		_logs.Clear();
-		RefreshLogText();
+		RefreshLog();
 	}
 
-	public void Shake() {
-		if (_target == null) {
+	private void OnMove(InputAction.CallbackContext context) {
+		_moveInput = context.ReadValue<Vector2>();
+	}
+
+	private void OnShake(InputAction.CallbackContext context) {
+		AddLog("흔들기 성공");
+		Shake();
+	}
+
+	private void Move(Vector2 direction) {
+		if (_target == null || direction == Vector2.zero) {
 			return;
 		}
 
-		_shakeCallback?.Invoke();
+		_target.position += (Vector3)(direction.normalized * (MOVE_SPEED * Time.deltaTime));
+	}
+
+	private void Shake() {
+		if (_target == null) {
+			return;
+		}
 
 #if DOTWEEN
 		_target.DOKill();
@@ -118,159 +146,20 @@ public class InputExample : MonoBehaviour {
 #endif
 	}
 
-	public void MoveUp() {
-		Move(Vector3.up);
-	}
-
-	public void MoveDown() {
-		Move(Vector3.down);
-	}
-
-	public void MoveLeft() {
-		Move(Vector3.left);
-	}
-
-	public void MoveRight() {
-		Move(Vector3.right);
-	}
-
-	private void Move(Vector3 direction) {
-		if (_target == null) {
-			return;
-		}
-
-		_target.position += direction * (_moveSpeed * Time.deltaTime);
-	}
-
-	private void RegisterDefaultInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		_keyInputBinder.AddListener(Key.UpArrow, InputTriggerType.Hold, MoveUp);
-		_keyInputBinder.AddListener(Key.DownArrow, InputTriggerType.Hold, MoveDown);
-		_keyInputBinder.AddListener(Key.LeftArrow, InputTriggerType.Hold, MoveLeft);
-		_keyInputBinder.AddListener(Key.RightArrow, InputTriggerType.Hold, MoveRight);
-	}
-
-	private void UnregisterDefaultInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		_keyInputBinder.RemoveListener(Key.UpArrow, InputTriggerType.Hold, MoveUp);
-		_keyInputBinder.RemoveListener(Key.DownArrow, InputTriggerType.Hold, MoveDown);
-		_keyInputBinder.RemoveListener(Key.LeftArrow, InputTriggerType.Hold, MoveLeft);
-		_keyInputBinder.RemoveListener(Key.RightArrow, InputTriggerType.Hold, MoveRight);
-	}
-
-	private void RegisterShakeInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		_keyInputBinder.AddListener(ToKey(_shakeKey), InputTriggerType.Pressed, OnShakeKeyPressed);
-	}
-
-	private void UnregisterShakeInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		_keyInputBinder.RemoveListener(ToKey(_shakeKey), InputTriggerType.Pressed, OnShakeKeyPressed);
-	}
-
-	private void RegisterFailedShakeInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		if (_shakeKey != ShakeInputKey.A) {
-			_keyInputBinder.AddListener(Key.A, InputTriggerType.Pressed, OnShakeFailedA);
-		}
-
-		if (_shakeKey != ShakeInputKey.S) {
-			_keyInputBinder.AddListener(Key.S, InputTriggerType.Pressed, OnShakeFailedS);
-		}
-
-		if (_shakeKey != ShakeInputKey.D) {
-			_keyInputBinder.AddListener(Key.D, InputTriggerType.Pressed, OnShakeFailedD);
-		}
-
-		if (_shakeKey != ShakeInputKey.F) {
-			_keyInputBinder.AddListener(Key.F, InputTriggerType.Pressed, OnShakeFailedF);
-		}
-	}
-
-	private void UnregisterFailedShakeInput() {
-		if (_keyInputBinder == null) {
-			return;
-		}
-
-		_keyInputBinder.RemoveListener(Key.A, InputTriggerType.Pressed, OnShakeFailedA);
-		_keyInputBinder.RemoveListener(Key.S, InputTriggerType.Pressed, OnShakeFailedS);
-		_keyInputBinder.RemoveListener(Key.D, InputTriggerType.Pressed, OnShakeFailedD);
-		_keyInputBinder.RemoveListener(Key.F, InputTriggerType.Pressed, OnShakeFailedF);
-	}
-
-	private void OnShakeKeyPressed() {
-		AddLog("흔들기 성공");
-		Shake();
-	}
-
-	private void OnShakeFailedA() {
-		AddShakeFailedLog(ShakeInputKey.A);
-	}
-
-	private void OnShakeFailedS() {
-		AddShakeFailedLog(ShakeInputKey.S);
-	}
-
-	private void OnShakeFailedD() {
-		AddShakeFailedLog(ShakeInputKey.D);
-	}
-
-	private void OnShakeFailedF() {
-		AddShakeFailedLog(ShakeInputKey.F);
-	}
-
-	private void AddShakeFailedLog(ShakeInputKey inputKey) {
-		if (inputKey == _shakeKey) {
-			return;
-		}
-
-		AddLog($"흔들기 실패. 현재 키: {_shakeKey}");
-	}
-
-	private Key ToKey(ShakeInputKey shakeInputKey) {
-		switch (shakeInputKey) {
-			case ShakeInputKey.A:
-				return Key.A;
-			case ShakeInputKey.S:
-				return Key.S;
-			case ShakeInputKey.D:
-				return Key.D;
-			case ShakeInputKey.F:
-				return Key.F;
-			default:
-				return Key.A;
-		}
-	}
-
 	private void AddLog(string message) {
 		Debug.Log(message);
 
 		_logs.Add(message);
 
-		while (_logs.Count > _maxLogCount) {
+		while (_logs.Count > MAX_LOG_COUNT) {
 			_logs.RemoveAt(0);
 		}
 
-		RefreshLogText();
+		RefreshLog();
 		ScrollToBottom();
 	}
 
-	private void RefreshLogText() {
+	private void RefreshLog() {
 		if (_logText == null) {
 			return;
 		}
@@ -301,7 +190,7 @@ public class InputExample : MonoBehaviour {
 		while (elapsedTime < SHAKE_DURATION) {
 			elapsedTime += Time.deltaTime;
 			float strength = Mathf.Lerp(SHAKE_STRENGTH, 0f, elapsedTime / SHAKE_DURATION);
-			_target.localPosition = startPosition + (Vector3)Random.insideUnitCircle * strength;
+			_target.localPosition = startPosition + (Vector3)UnityEngine.Random.insideUnitCircle * strength;
 			yield return null;
 		}
 
