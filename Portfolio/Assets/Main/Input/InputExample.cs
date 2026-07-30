@@ -117,7 +117,8 @@ public class InputExample : MonoBehaviour {
 	}
 
 	private void OnShake(InputAction.CallbackContext context) {
-		AddLog("흔들기 성공");
+		string pressedKey = context.control != null ? context.control.displayName : _shakeKey.ToString();
+		AddLog($"흔들기 성공: {pressedKey}");
 		Shake();
 	}
 

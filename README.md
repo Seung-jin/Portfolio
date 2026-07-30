@@ -9,3 +9,5 @@
 - 이동 컴포넌트 [MoveComponent](docs/Move.md)
 - 옵저버 패턴 [ObserverPattern](docs/Observer.md)
 - 오브젝트 풀링 [ObjectPooling](docs/Pooling.md)
+- 오브젝트 팩토리 [Factory](docs/Factory.md)
+- 입력 [Input](docs/Input.md)
